@@ -1,33 +1,49 @@
-import { Card, Screen, Section, Txt, Btn, Line } from '../../src/ui/kit';
+import { useRouter } from 'expo-router';
+import { View } from 'react-native';
+import { Btn, Card, Line, Screen, Section, Txt } from '../../src/ui/kit';
 
-const habits = ['Hydration', 'Exercise', 'Balanced nutrition', 'Sleep', 'Skincare', 'Grooming'];
+const routines = [
+  { title: 'Push & pull strength', sets: '4 rounds', time: '32 min' },
+  { title: 'HIIT cardio', sets: '3 circuits', time: '18 min' },
+  { title: 'Recovery mobility', sets: '10 min', time: 'Low intensity' },
+];
 
-export default function GlowUpScreen() {
+const exercises = ['Pull-ups', 'Push-ups', 'Squats', 'Walking', 'Planks', 'Deadlifts'];
+
+export default function FitnessScreen() {
+  const router = useRouter();
   return (
-    <Screen tab title="Glow Up">
+    <Screen tab title="Fitness">
       <Card>
-        <Txt v="headline">Daily glow score</Txt>
-        <Txt style={{ fontSize: 32, fontWeight: '800' }}>84%</Txt>
-        <Line label="Completed" value="6 of 7 habits" />
-        <Line label="Streak" value="9 days" />
+        <Txt v="headline">Weekly training</Txt>
+        <Line label="Workouts this week" value="3 planned" />
+        <Line label="Consistency" value="72%" />
+        <Line label="Volume" value="4.8 hrs" />
       </Card>
 
-      <Section title="Core habits">
-        {habits.map((habit) => (
-          <Card key={habit} style={{ padding: 12 }}>
-            <Txt>{habit}</Txt>
-          </Card>
-        ))}
+      <Section title="Routines">
+        <View style={{ gap: 10 }}>
+          {routines.map((routine) => (
+            <Card key={routine.title} style={{ padding: 12, gap: 6 }}>
+              <Txt style={{ fontWeight: '600' }}>{routine.title}</Txt>
+              <Txt v="muted">{routine.sets} • {routine.time}</Txt>
+            </Card>
+          ))}
+        </View>
       </Section>
 
-      <Section title="Routine">
+      <Section title="Exercise library">
         <Card style={{ gap: 8 }}>
-          <Txt>Morning: cleanse, hydrate, sunscreen</Txt>
-          <Txt>Evening: double cleanse, moisturise, floss</Txt>
+          {exercises.map((exercise) => (
+            <Txt key={exercise} v="muted">• {exercise}</Txt>
+          ))}
         </Card>
       </Section>
 
-      <Btn kind="primary" title="Track today" icon="glow" onPress={() => {}} />
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+        <Btn kind="primary" title="Log workout" icon="fitness" onPress={() => router.push('/settings')} />
+        <Btn title="View progress" icon="progress" onPress={() => router.push('/progress')} />
+      </View>
     </Screen>
   );
 }

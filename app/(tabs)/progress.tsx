@@ -1,32 +1,36 @@
-import { Card, Screen, Section, Txt, Btn, Line } from '../../src/ui/kit';
+import { View } from 'react-native';
+import { Btn, Card, Line, Screen, Section, Txt } from '../../src/ui/kit';
 
-export default function ProgressScreen() {
+const habits = ['Hydration', 'Exercise', 'Balanced nutrition', 'Sleep', 'Skincare', 'Grooming'];
+
+export default function GlowUpScreen() {
   return (
-    <Screen tab title="Progress">
+    <Screen tab title="Glow Up">
       <Card>
-        <Txt v="headline">This week</Txt>
-        <Line label="Calories" value="2,140 avg" />
-        <Line label="Water" value="2.4 L avg" />
-        <Line label="Steps" value="9,800 avg" />
+        <Txt v="headline">Daily glow score</Txt>
+        <Txt style={{ fontSize: 32, fontWeight: '800' }}>84%</Txt>
+        <Line label="Completed" value="6 of 7 habits" />
+        <Line label="Streak" value="9 days" />
       </Card>
 
-      <Section title="Trends">
+      <Section title="Core habits">
+        <View style={{ gap: 10 }}>
+          {habits.map((habit) => (
+            <Card key={habit} style={{ padding: 12 }}>
+              <Txt>{habit}</Txt>
+            </Card>
+          ))}
+        </View>
+      </Section>
+
+      <Section title="Routine">
         <Card style={{ gap: 8 }}>
-          <Txt>Weight trend: stable</Txt>
-          <Txt>Body measurements: 2 entries logged</Txt>
-          <Txt>Training consistency: 3/5 workouts</Txt>
+          <Txt>Morning: cleanse, hydrate, sunscreen</Txt>
+          <Txt>Evening: double cleanse, moisturise, floss</Txt>
         </Card>
       </Section>
 
-      <Section title="Milestones">
-        <Card style={{ gap: 10 }}>
-          <Txt>Personal record: 12 pull-ups</Txt>
-          <Txt>Longest streak: 9 days</Txt>
-          <Txt>Sleep consistency: 7.2 hrs avg</Txt>
-        </Card>
-      </Section>
-
-      <Btn kind="primary" title="Export data" icon="progress" onPress={() => {}} />
+      <Btn kind="primary" title="Track today" icon="glow" onPress={() => {}} />
     </Screen>
   );
 }
