@@ -8,11 +8,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { backdrop, color, radius, shadow, type } from './theme';
 
 export const row = { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 } as const;
-/** Room a tab screen leaves at the bottom for the floating tab bar. */
 export const TAB_BAR = 88;
 
-/** Safe-area insets. On a Pixel 7 (Android 17) the first launch after install reported top 0 until the next redraw, putting the
- *  title under the clock, so Android never goes below the status bar height it knows at startup. */
 export function useInsets() {
   const i = useSafeAreaInsets();
   return { ...i, top: Math.max(i.top, StatusBar.currentHeight ?? 0) };
@@ -22,7 +19,6 @@ export function Txt({ v = 'body', style, ...p }: TextProps & { v?: keyof typeof 
   return <Text style={[type[v], style]} {...p} />;
 }
 
-// SF Symbols on iOS, Material Symbols on Android; add a pair here rather than naming symbols in screens.
 const ICONS = {
   today: { ios: 'calendar', android: 'calendar_today' },
   search: { ios: 'magnifyingglass', android: 'search' },
@@ -36,11 +32,13 @@ const ICONS = {
   edit: { ios: 'pencil', android: 'edit' },
   warn: { ios: 'exclamationmark.triangle', android: 'warning' },
   download: { ios: 'arrow.down.circle', android: 'download' },
+  food: { ios: 'fork.knife', android: 'restaurant' },
+  fitness: { ios: 'dumbbell.fill', android: 'fitness_center' },
+  glow: { ios: 'sparkles', android: 'auto_awesome' },
+  progress: { ios: 'chart.line.uptrend.xyaxis', android: 'show_chart' },
 } as const;
 export type IconName = keyof typeof ICONS;
-/** Decorative: the control around it carries the label, so screen readers skip the glyph. */
 export function Icon({ name, size = 22, tint = color.text }: { name: IconName; size?: number; tint?: string }) {
-  // Android draws the symbol as a font glyph that scales with system text size and overflows its box; undo that so icons stay put.
   const { fontScale } = useWindowDimensions();
   const glyph = Platform.OS === 'android' ? size / fontScale : size;
   return (
@@ -51,14 +49,12 @@ export function Icon({ name, size = 22, tint = color.text }: { name: IconName; s
 }
 
 const LIQUID = isLiquidGlassAvailable();
-/** Floating chrome: system Liquid Glass on iOS 26+, a bright translucent sheet elsewhere. Content goes on Card, never on this. */
 export function Glass({ style, ...p }: ViewProps) {
   return LIQUID
     ? <GlassView glassEffectStyle="regular" style={[{ borderRadius: radius.card }, style]} {...p} />
     : <View style={[{ borderRadius: radius.card, backgroundColor: color.chrome, borderWidth: 1, borderColor: color.edge, boxShadow: shadow.chrome }, style]} {...p} />;
 }
 
-/** A frosted content surface. */
 export function Card({ style, ...p }: ViewProps) {
   return <View style={[{ padding: 16, gap: 10, borderRadius: radius.card, backgroundColor: color.frost, borderWidth: 1, borderColor: color.edge, boxShadow: shadow.card }, style]} {...p} />;
 }
@@ -66,7 +62,6 @@ export function Card({ style, ...p }: ViewProps) {
 type BtnProps = { title: string; onPress(): void; disabled?: boolean; kind?: 'primary' | 'tinted' | 'plain' | 'destructive' | 'danger'; small?: boolean; icon?: IconName };
 const FILL = { primary: color.green, tinted: color.greenTint, plain: 'transparent', destructive: color.dangerTint, danger: color.danger } as const;
 const INK = { primary: color.text, tinted: color.greenDeep, plain: color.greenDeep, destructive: color.danger, danger: color.white } as const;
-/** One primary per screen; everything else is tinted or plain. Deleting is `destructive`, and `danger` once armed by the first tap. */
 export function Btn({ title, onPress, disabled, kind = 'tinted', small, icon }: BtnProps) {
   return (
     <Pressable onPress={onPress} disabled={disabled} hitSlop={small ? 6 : 0} accessibilityRole="button" accessibilityLabel={title} accessibilityState={{ disabled: !!disabled }}
@@ -95,7 +90,6 @@ export function Field({ style, ...p }: TextInputProps) {
   );
 }
 
-/** A captioned group of related rows: the iOS grouped list. */
 export function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <View style={{ gap: 8 }}>
@@ -105,7 +99,6 @@ export function Section({ title, children }: { title: string; children: ReactNod
   );
 }
 
-/** A label with its value at the right edge: nutrition lines, settings rows. Large text drops the value to its own line. */
 export function Line({ label, value }: { label: string; value: string }) {
   return (
     <View style={{ ...row, flexWrap: 'wrap', paddingVertical: 4 }}>
@@ -115,7 +108,6 @@ export function Line({ label, value }: { label: string; value: string }) {
   );
 }
 
-/** Orange asks for attention, red reports a failure. The colour lives in the badge so the text stays on a clean surface. */
 export function Banner({ text, kind = 'warn', onPress }: { text: string; kind?: 'warn' | 'error'; onPress(): void }) {
   const warn = kind === 'warn';
   return (
@@ -135,7 +127,6 @@ export function Logo({ size = 96 }: { size?: number }) {
   return <Image source={require('../../assets/logo.png')} style={{ width: size, height: size }} accessibilityLabel="Calorie Tracker" />;
 }
 
-/** The brand mark's progress ring. Two half-discs, each clipping a rotated two-sided border, sweep 0 to 360 degrees. */
 export function Ring({ size, width, frac, children }: { size: number; width: number; frac: number; children?: ReactNode }) {
   const deg = Math.max(0, Math.min(frac, 1)) * 360;
   const ink = frac >= 1 ? color.orange : color.green;
@@ -158,7 +149,6 @@ export function Ring({ size, width, frac, children }: { size: number; width: num
 }
 
 type ScreenProps = { title: string; right?: ReactNode; tab?: boolean; scroll?: boolean; overlay?: ReactNode; children: ReactNode };
-/** Every screen: the backdrop, the safe areas and the header. Stack screens get a back button, tab screens a large title. */
 export function Screen({ title, right, tab, scroll = true, overlay, children }: ScreenProps) {
   const router = useRouter();
   const insets = useInsets();

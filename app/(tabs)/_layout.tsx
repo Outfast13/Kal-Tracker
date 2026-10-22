@@ -4,12 +4,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Glass, Icon, type IconName } from '../../src/ui/kit';
 import { color } from '../../src/ui/theme';
 
-// Today's Add and Scan buttons put day/meal on these tabs; tab params persist, so a plain tab tap must not log to a past day.
-const clearMealParams = ({ navigation }: { navigation: { setParams(p: object): void } }) =>
-  ({ tabPress: () => navigation.setParams({ day: undefined, meal: undefined }) });
-const ICON: Record<string, IconName> = { index: 'today', search: 'search', scan: 'scan', settings: 'settings' };
+const ICON: Record<string, IconName> = { index: 'today', food: 'food', fitness: 'fitness', glow: 'glow', progress: 'progress' };
 
-/** A floating glass pill; screens scroll underneath it and pad their content by TAB_BAR. */
 function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   return (
@@ -36,10 +32,11 @@ function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 export default function TabsLayout() {
   return (
     <Tabs tabBar={p => <TabBar {...p} />} screenOptions={{ headerShown: false }}>
-      <Tabs.Screen name="index" options={{ title: 'Today' }} />
-      <Tabs.Screen name="search" options={{ title: 'Search' }} listeners={clearMealParams} />
-      <Tabs.Screen name="scan" options={{ title: 'Scan' }} listeners={clearMealParams} />
-      <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
+      <Tabs.Screen name="index" options={{ title: 'Home' }} />
+      <Tabs.Screen name="food" options={{ title: 'Food' }} />
+      <Tabs.Screen name="fitness" options={{ title: 'Fitness' }} />
+      <Tabs.Screen name="glow" options={{ title: 'Glow Up' }} />
+      <Tabs.Screen name="progress" options={{ title: 'Progress' }} />
     </Tabs>
   );
 }
