@@ -19,29 +19,33 @@ const pretty = (day: string) => new Date(`${day}T12:00:00`).toLocaleDateString(u
 export default function Today() {
   const { diary } = useDb();
   const router = useRouter();
-  const { fontScale } = useWindowDimensions();   // large system text grows the ring and stacks the bars under it
+  const { fontScale } = useWindowDimensions();
   const [day, setDay] = useState(today());
   const [entries, setEntries] = useState<Entry[]>([]);
   const [targets, setTargets] = useState<Nutrients>({});
   const [meals, setMeals] = useState(DEFAULT_MEALS);
   const [more, setMore] = useState(false);
   const [deleted, setDeleted] = useState<Entry | null>(null);
-  const [md5, setMd5] = useState<string | null>(null);        // installed file; null while on the bundled starter
-  const [latest, setLatest] = useState<string | null>(null);  // the manifest's file for the chosen country
+  const [md5, setMd5] = useState<string | null>(null);
+  const [latest, setLatest] = useState<string | null>(null);
   const [backupPending, setBackupPending] = useState(false);
-  const [burned, setBurned] = useState<number | null>(null);   // Health Connect active calories; null when off or unavailable
+  const [burned, setBurned] = useState<number | null>(null);
+  const [water, setWater] = useState(0);
+  const [steps, setSteps] = useState(0);
 
   const load = useCallback(async () => {
     setEntries(await entriesForDay(diary, day));
     setTargets(await goals(diary));
     setMeals(await getJson<string[]>(diary, 'meals', DEFAULT_MEALS));
+    setWater(Number(await getSetting(diary, `water_${day}`)) || 0);
+    setSteps(Number(await getSetting(diary, `steps_${day}`)) || 0);
     setMd5(await getSetting(diary, 'foods_md5'));
     setBackupPending((await getSetting(diary, 'backup_pending')) === '1');
     setBurned((await getSetting(diary, 'health_enabled')) === '1' ? await readActiveCalories(day) : null);
   }, [diary, day]);
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
-  useEffect(() => {   // on launch and foreground: once a day, ask the manifest whether a newer file exists. Nothing downloads without a tap.
+  useEffect(() => {
     const check = async () => {
       const last = await getSetting(diary, 'foods_checked_at');
       if (!checkDue(last ? Number(last) : null, Date.now(), Math.random())) return;
@@ -59,6 +63,17 @@ export default function Today() {
   const starter = !md5, newer = !!md5 && !!latest && latest !== md5;
   const totals = sum(entries.map(e => e.nutrients));
 
+  const changeWater = async (delta: number) => {
+    const next = Math.max(0, water + delta);
+    setWater(next);
+    await setSetting(diary, `water_${day}`, String(next));
+  };
+  const changeSteps = async (delta: number) => {
+    const next = Math.max(0, steps + delta);
+    setSteps(next);
+    await setSetting(diary, `steps_${day}`, String(next));
+  };
+
   const remove = async (e: Entry) => {
     await unlogEntry(diary, e.id);
     await load();
@@ -67,7 +82,7 @@ export default function Today() {
   };
   const undo = async () => {
     if (!deleted) return;
-    await logEntry(diary, { ...deleted, health_id: null });   // the old Health Connect record went with the delete
+    await logEntry(diary, { ...deleted, health_id: null });
     setDeleted(null);
     await load();
   };
@@ -117,6 +132,39 @@ export default function Today() {
         })}
       </Card>
 
+      {/* Daily trackers: tap once to log; each date has its own saved totals. */}
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+        <Card style={{ flex: 1, minWidth: 145, gap: 12 }}>
+          <Txt v="headline">💧 Water</Txt>
+          <Txt style={{ fontSize: 28, fontWeight: '800', fontVariant: ['tabular-nums'] }}>{(water / 1000).toFixed(2)} L</Txt>
+          <Txt v="muted">{water.toLocaleString()} ml logged</Txt>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            <Btn title="+250 ml" icon="add" onPress={() => changeWater(250)} />
+            <Btn title="+500 ml" icon="add" onPress={() => changeWater(500)} />
+            <Btn title="Undo 250" kind="plain" small onPress={() => changeWater(-250)} disabled={water === 0} />
+          </View>
+        </Card>
+        <Card style={{ flex: 1, minWidth: 145, gap: 12 }}>
+          <Txt v="headline">👟 Steps</Txt>
+          <Txt style={{ fontSize: 28, fontWeight: '800', fontVariant: ['tabular-nums'] }}>{steps.toLocaleString()}</Txt>
+          <Txt v="muted">steps logged today</Txt>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            <Btn title="+500" icon="add" onPress={() => changeSteps(500)} />
+            <Btn title="+1,000" icon="add" onPress={() => changeSteps(1000)} />
+            <Btn title="Reset" kind="plain" small onPress={() => changeSteps(-steps)} disabled={steps === 0} />
+          </View>
+        </Card>
+      </View>
+
+      <Card style={{ gap: 12 }}>
+        <Txt v="headline">Quick actions</Txt>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+          <Btn kind="primary" title="Add food" icon="add" onPress={() => router.push('/search')} />
+          <Btn title="Scan barcode" icon="scan" onPress={() => router.push('/scan')} />
+          <Btn title="Log weight" icon="weight" onPress={() => router.push('/weight')} />
+        </View>
+      </Card>
+
       {sections.map(([meal, es]) => (
         <Card key={meal} style={{ gap: 0 }}>
           <View style={{ ...row, flexWrap: 'wrap' }}>
@@ -148,3 +196,4 @@ export default function Today() {
     </Screen>
   );
 }
+
