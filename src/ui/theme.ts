@@ -6,11 +6,11 @@ export const brand = { green: '#2E8E69', teal: '#1C8DA1', orange: '#B86609', cha
 export const color = {
   ...brand,
   white: '#FFFFFF',
-  text: '#1C2A33',
+  text: brand.charcoal,
   textMuted: '#52606B',
-  greenDeep: '#0E5A42',
-  tealDeep: '#0D5C6C',
-  danger: '#8E2D2F',
+  greenDeep: '#0C4F3D',
+  tealDeep: '#0D5D6C',
+  danger: '#7A1E25',
   frost: 'rgba(255,255,255,0.62)',
   chrome: 'rgba(255,255,255,0.94)',
   edge: 'rgba(36, 50, 61, 0.12)',
@@ -18,7 +18,7 @@ export const color = {
   field: 'rgba(255,255,255,0.7)',
   switchOff: 'rgba(36,50,61,0.28)',
   greenTint: 'rgba(46, 142, 105, 0.12)',
-  dangerTint: 'rgba(142, 45, 47, 0.10)',
+  dangerTint: 'rgba(122, 30, 37, 0.10)',
   scrim: 'rgba(36,50,61,0.55)',
 } as const;
 
