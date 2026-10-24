@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0B1320" />
+    <title>Kal Tracker</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <h1>Kal Tracker</h1>
+      </header>
+
+      <main class="card">
+        <p class="label">Today</p>
+        <h2 id="calories">0 kcal</h2>
+
+        <div class="actions">
+          <button id="addFood">Add Food</button>
+          <button id="addWorkout">Add Workout</button>
+        </div>
+
+        <div class="stats">
+          <div>
+            <span>Protein</span>
+            <strong id="protein">0g</strong>
+          </div>
+          <div>
+            <span>Carbs</span>
+            <strong id="carbs">0g</strong>
+          </div>
+          <div>
+            <span>Fat</span>
+            <strong id="fat">0g</strong>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

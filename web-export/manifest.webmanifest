@@ -1,0 +1,10 @@
+{
+  "name": "Kal Tracker",
+  "short_name": "KalTracker",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0B1320",
+  "theme_color": "#0B1320",
+  "description": "Kal Tracker web app",
+  "icons": []
+}
